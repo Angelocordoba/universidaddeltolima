@@ -7,4 +7,4 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-export default supabase;
+export { supabase };

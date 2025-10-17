@@ -7,6 +7,14 @@ import DashboardVigilancia from "./pages/DashboardVigilancia";
 import DashboardProfesor from "./pages/DashboardProfesor";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import PreRegistro from "./pages/PreRegistro";
+import ExitoRegistro from "./pages/ExitoRegistro";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Ventanilla from "./pages/Ventanilla";
+import QRScanner from "./pages/QRScanner";
+
+
 
 export default function App() {
   return (
@@ -22,6 +30,12 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+         <Router>
+           <Routes>
+            <Route path="/ventanilla" element={<Ventanilla />} />
+            <Route path="/escaner" element={<QRScanner />} />
+        </Routes>
+         </Router>
           <Route
             path="/dependencia"
             element={
@@ -30,6 +44,12 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Router>
+           <Routes>
+              <Route path="/" element={<PreRegistro />} />
+              <Route path="/exito" element={<ExitoRegistro />} />
+            </Routes>
+          </Router>
           <Route
             path="/ventanilla"
             element={

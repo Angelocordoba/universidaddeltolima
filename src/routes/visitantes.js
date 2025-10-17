@@ -1,46 +1,44 @@
 import express from "express";
-import supabase from "../services/supabaseClient.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { supabase } from "../services/supabaseClient.js";
+import { qrGenerator } from "../utils/qrGenerator.js";
+import { enviarCorreoInvitacion } from "../services/emailService.js";
 
 const router = express.Router();
 
-/**
- * Obtener todos los visitantes registrados
- */
-router.get("/", verifyToken, async (req, res) => {
-  const { data, error } = await supabase
-    .from("visitantes")
-    .select("*")
-    .order("fecha_ingreso", { ascending: false });
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
-});
-
-/**
- * Registrar un nuevo visitante
- */
+// POST /api/visitantes
 router.post("/", async (req, res) => {
-  const { nombre, documento, correo, motivo, destino, dependencia_id } = req.body;
+  try {
+    const { cedula, nombre, correo, telefono, evento_id } = req.body;
 
-  const { data, error } = await supabase
-    .from("visitantes")
-    .insert([{ nombre, documento, correo, motivo, destino, dependencia_id }])
-    .select();
+    // Insertar preregistro (evita duplicado con tu función SQL)
+    const { data, error } = await supabase.rpc("registrar_visitante_sin_duplicar", {
+      p_cedula: cedula,
+      p_nombre: nombre,
+      p_correo: correo,
+      p_telefono: telefono,
+      p_evento_id: evento_id,
+    });
 
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json(data[0]);
+    if (error) throw error;
+
+    // Generar token (UUID simple)
+    const token = data; // ID devuelto desde Supabase
+    const link = `https://universidaddeltolima.onrender.com/confirmar/${token}`;
+
+    // Generar QR con el enlace
+    const qr = await qrGenerator(link);
+
+    // Enviar correo
+    if (correo) {
+      await enviarCorreoInvitacion(correo, nombre, qr);
+    }
+
+    res.json({ ok: true, id: token, qr });
+  } catch (err) {
+    console.error("Error registrando visitante:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
-
-/**
- * Obtener visitante por ID
- */
-router.get("/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-  const { data, error } = await supabase.from("visitantes").select("*").eq("id", id).single();
-
-  if (error) return res.status(404).json({ error: "Visitante no encontrado" });
-  res.json(data);
-});
-
 export default router;
+
+

@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import "dotenv/config";
 
 import authRoutes from "./routes/auth.js";
 import eventoRoutes from "./routes/eventos.js";
 import visitanteRoutes from "./routes/visitantes.js";
 import dependenciaRoutes from "./routes/dependencias.js";
+import registrosRouter from "./routes/registros.js";
 
 dotenv.config();
 
@@ -18,6 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/eventos", eventoRoutes);
 app.use("/api/visitantes", visitanteRoutes);
 app.use("/api/dependencias", dependenciaRoutes);
+app.use("/api/registros", registrosRouter);
 
 app.get("/", (req, res) => res.send("✅ API UT Visitantes corriendo"));
 
