@@ -8,6 +8,9 @@ import eventoRoutes from "./routes/eventos.js";
 import visitanteRoutes from "./routes/visitantes.js";
 import dependenciaRoutes from "./routes/dependencias.js";
 import registrosRouter from "./routes/registros.js";
+import cursosRoutes from "./routes/cursos.js";
+import adminRoutes from "./routes/admin.js";
+import exportRoutes from "./routes/export.js";
 
 dotenv.config();
 
@@ -21,6 +24,9 @@ app.use("/api/eventos", eventoRoutes);
 app.use("/api/visitantes", visitanteRoutes);
 app.use("/api/dependencias", dependenciaRoutes);
 app.use("/api/registros", registrosRouter);
+app.use("/api/cursos", cursosRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/export", exportRoutes);
 
 app.get("/", (req, res) => res.send("✅ API UT Visitantes corriendo"));
 

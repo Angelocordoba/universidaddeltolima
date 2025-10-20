@@ -1,5 +1,5 @@
 import express from "express";
-import { supabase } from "../services/supabaseClient.js";
+import supabase from "../services/supabaseClient.js";
 import { validarTokenQR } from "../utils/validarTokenQR.js";
 
 const router = express.Router();

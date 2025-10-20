@@ -1,5 +1,5 @@
 import express from "express";
-import { supabase } from "../services/supabaseClient.js";
+import supabase from "../services/supabaseClient.js";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
