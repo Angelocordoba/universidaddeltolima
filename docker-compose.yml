@@ -1,0 +1,81 @@
+version: '3.9'
+
+services:
+  # ==========================
+  # 🐘 Base de datos Postgres
+  # ==========================
+  postgres:
+    image: postgres:15
+    container_name: ut_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ut_admin
+      POSTGRES_PASSWORD: ut_password
+      POSTGRES_DB: ut_visitas
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ut_network
+
+  # ==========================
+  # 🧠 Redis (cache / cola)
+  # ==========================
+  redis:
+    image: redis:7
+    container_name: ut_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - ut_network
+
+  # ==========================
+  # 🧰 pgAdmin (interfaz visual)
+  # ==========================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ut_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ut.edu.co
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - ut_network
+
+  # ==========================
+  # 🧩 Backend Express + Supabase client
+  # ==========================
+  backend:
+    build: .
+    container_name: ut_backend
+    restart: always
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgresql://ut_admin:ut_password@postgres:5432/ut_visitas
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=supersecreto123
+      - SUPABASE_URL=https://<tu-supabase>.supabase.co
+      - SUPABASE_KEY=<tu-key>
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ut_network
+
+networks:
+  ut_network:
+    driver: bridge
+
+volumes:
+  db_data:

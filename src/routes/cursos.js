@@ -1,5 +1,5 @@
 import express from "express";
-import supabase from "../services/supabaseClient.js";
+import { supabase } from "../services/supabaseClient.js";
 import { randomBytes } from "crypto";
 import csvParser from "csv-parser";
 import fs from "fs";

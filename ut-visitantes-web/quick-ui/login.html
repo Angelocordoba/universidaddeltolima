@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Login UT</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <div class="container">
+    <h1>Iniciar sesión (demo)</h1>
+    <form id="f">
+      <div class="row">
+        <input name="email" type="email" placeholder="correo" required />
+        <input name="password" type="text" placeholder="contraseña" required />
+      </div>
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="out" style="margin-top:12px"></div>
+  </div>
+
+<script>
+const API_BASE = "https://universidaddeltolima.onrender.com";
+const f = document.getElementById('f');
+const out = document.getElementById('out');
+
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  out.innerHTML = 'Ingresando...';
+  const fd = new FormData(f);
+  try {
+    const resp = await fetch(`${API_BASE}/api/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: fd.get('email'), password: fd.get('password') })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data?.error || 'Login fallido');
+    // esperamos { token, user }
+    sessionStorage.setItem('token', data.token);
+    out.innerHTML = `<div>OK. Bienvenido ${data.user?.nombre || data.user?.email}. <br/><a href="admin.html">Ir a Admin</a></div>`;
+  } catch (err) {
+    out.innerHTML = `<div class="notice">${err.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

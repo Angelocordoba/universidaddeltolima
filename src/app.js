@@ -11,6 +11,9 @@ import registrosRouter from "./routes/registros.js";
 import cursosRoutes from "./routes/cursos.js";
 import adminRoutes from "./routes/admin.js";
 import exportRoutes from "./routes/export.js";
+import usuariosRoutes from "./routes/usuarios.js";
+import 'dotenv/config';
+
 
 dotenv.config();
 
@@ -27,8 +30,13 @@ app.use("/api/registros", registrosRouter);
 app.use("/api/cursos", cursosRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/export", exportRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 
 app.get("/", (req, res) => res.send("✅ API UT Visitantes corriendo"));
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Servidor corriendo en puerto ${process.env.PORT || 3000}`);
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

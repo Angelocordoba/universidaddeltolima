@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Admin UT</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <div class="container">
+    <div class="header"><h1>Admin Panel (Superadmin)</h1><div><a href="index.html" class="small">Preregistro</a></div></div>
+
+    <p class="small">Acciones rápidas. Debes iniciar sesión (login demo) y tener token en sessionStorage.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="card">
+        <h3>Crear dependencia</h3>
+        <form id="f-dep"><input name="nombre" placeholder="Nombre" required /><textarea name="descripcion" placeholder="Descripción"></textarea><button>Crear</button></form>
+        <pre id="out-dep"></pre>
+      </div>
+
+      <div class="card">
+        <h3>Crear usuario</h3>
+        <form id="f-user">
+          <input name="correo" placeholder="correo" required />
+          <input name="contrasena" placeholder="contrasena" required />
+          <input name="nombre" placeholder="Nombre" required />
+          <input name="rol" placeholder="rol (superadmin|dependencia|vigilante|ventanilla|profesor|usuario)" value="dependencia" />
+          <input name="dependencia_id" placeholder="dependencia_id (opcional uuid)" />
+          <button>Crear usuario</button>
+        </form>
+        <pre id="out-user"></pre>
+      </div>
+
+      <div class="card" style="grid-column:span 2">
+        <h3>Crear evento</h3>
+        <form id="f-evento">
+          <input name="nombre" placeholder="Nombre evento" required />
+          <textarea name="descripcion" placeholder="Descripción"></textarea>
+          <div class="row">
+            <input name="fecha_inicio" type="date" required />
+            <input name="fecha_fin" type="date" required />
+          </div>
+          <div class="row">
+            <input name="cupo_maximo" type="number" value="50" />
+            <input name="dependencia_id" placeholder="dependencia_id" />
+          </div>
+          <button>Crear evento</button>
+        </form>
+        <pre id="out-evento"></pre>
+      </div>
+    </div>
+  </div>
+
+<script>
+const API_BASE = "https://universidaddeltolima.onrender.com";
+const token = sessionStorage.getItem('token') || '';
+
+function headers() {
+  return { 'Content-Type':'application/json', ...(token ? { 'Authorization':'Bearer '+token } : {}) };
+}
+
+// dependencia
+document.getElementById('f-dep').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = { nombre: fd.get('nombre'), descripcion: fd.get('descripcion') };
+  const r = await fetch(`${API_BASE}/api/admin/dependencias`, { method:'POST', headers: headers(), body: JSON.stringify(body) });
+  document.getElementById('out-dep').textContent = JSON.stringify(await r.json(), null, 2);
+});
+
+// usuario
+document.getElementById('f-user').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = {
+    correo: fd.get('correo'), contrasena: fd.get('contrasena'), nombre: fd.get('nombre'),
+    rol: fd.get('rol'), dependencia_id: fd.get('dependencia_id') || null
+  };
+  const r = await fetch(`${API_BASE}/api/admin/usuarios`, { method:'POST', headers: headers(), body: JSON.stringify(body) });
+  document.getElementById('out-user').textContent = JSON.stringify(await r.json(), null, 2);
+});
+
+// evento
+document.getElementById('f-evento').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const body = {
+    nombre: fd.get('nombre'),
+    descripcion: fd.get('descripcion'),
+    fecha_inicio: fd.get('fecha_inicio'),
+    fecha_fin: fd.get('fecha_fin'),
+    cupo_maximo: parseInt(fd.get('cupo_maximo')) || 0,
+    dependencia_id: fd.get('dependencia_id') || null
+  };
+  const r = await fetch(`${API_BASE}/api/eventos`, { method:'POST', headers: headers(), body: JSON.stringify(body) });
+  document.getElementById('out-evento').textContent = JSON.stringify(await r.json(), null, 2);
+});
+</script>
+</body>
+</html>

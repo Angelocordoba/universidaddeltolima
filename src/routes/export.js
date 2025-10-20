@@ -1,5 +1,5 @@
 import express from "express";
-import supabase from "../services/supabaseClient.js";
+import { supabase } from "../services/supabaseClient.js";
 import { Parser } from "json2csv";
 import ExcelJS from "exceljs";
 

@@ -1,0 +1,16 @@
+/* styles.css - simple, responsivo */
+:root{--green:#138a3b;--muted:#6b7280}
+body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:#f7faf9;color:#111}
+.container{max-width:900px;margin:32px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(12,15,25,.06)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+h1{margin:0;font-size:20px}
+form .row{display:flex;gap:8px;margin-bottom:8px}
+input[type=text],input[type=email],input[type=date],input[type=number],textarea,select{flex:1;padding:10px;border:1px solid #e6e9ee;border-radius:8px}
+button{background:var(--green);color:#fff;padding:10px 14px;border:0;border-radius:8px;cursor:pointer}
+button.secondary{background:#6b7280}
+.small{font-size:13px;color:var(--muted)}
+.card{padding:12px;border-radius:8px;border:1px solid #eef2f7;background:#fafcff}
+pre{white-space:pre-wrap;background:#0f1724;color:#e6eef3;padding:12px;border-radius:8px;overflow:auto}
+img.qr{max-width:220px;border-radius:8px;border:1px solid #e6e9ee}
+.center{display:flex;align-items:center;justify-content:center}
+.notice{background:#fff7ed;color:#92400e;padding:10px;border-radius:6px}

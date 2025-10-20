@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Escáner QR</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <div class="container">
+    <h1>Escáner QR (Vigilancia)</h1>
+    <div id="reader" style="width:100%;max-width:560px;margin:0 auto"></div>
+    <div id="out" style="margin-top:12px"></div>
+  </div>
+
+  <!-- html5-qrcode CDN -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<script>
+const API_BASE = "https://universidaddeltolima.onrender.com";
+const out = document.getElementById('out');
+
+function onScanSuccess(decodedText, decodedResult) {
+  // decodedText es el token/URL codificado
+  out.innerHTML = `Leído: ${decodedText} — registrando...`;
+  // Si el QR contiene URL con token, intenta extraer token final
+  let token = decodedText;
+  try {
+    const u = new URL(decodedText);
+    // si es link como /confirmar/<id> -> extraer última parte
+    token = u.pathname.split('/').pop() || decodedText;
+  } catch(e) {}
+  fetch(`${API_BASE}/api/registros/checkin`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ token })
+  }).then(r => r.json()).then(j => {
+    if (j.error) out.innerHTML = `<div class="notice">Error: ${j.error}</div>`;
+    else out.innerHTML = `<div class="notice">Entrada registrada: ${j.nombre || token}</div>`;
+  }).catch(err => out.innerHTML = `<div class="notice">Error: ${err.message}</div>`);
+}
+
+function onScanError(errorMessage) {
+  // console.log(errorMessage);
+}
+
+const html5QrCode = new Html5Qrcode("reader");
+Html5Qrcode.getCameras().then(cameras => {
+  if (cameras && cameras.length) {
+    const cameraId = cameras[0].id;
+    html5QrCode.start(
+      cameraId,
+      { fps: 10, qrbox: 250 },
+      onScanSuccess,
+      onScanError
+    );
+  } else {
+    out.innerHTML = '<div class="notice">No se encontró cámara</div>';
+  }
+}).catch(err => {
+  out.innerHTML = `<div class="notice">Error cámara: ${err.message}</div>`;
+});
+</script>
+</body>
+</html>

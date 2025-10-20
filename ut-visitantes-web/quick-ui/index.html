@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UT - Preregistro Visitantes</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Universidad del Tolima — Preregistro</h1>
+      <div><a href="login.html" class="small">Iniciar sesión</a> · <a href="ventanilla.html" class="small">Ventanilla</a></div>
+    </div>
+
+    <p class="small">Rellene el formulario para preregistrarse. Recibirá un código QR por pantalla y por correo (si backend lo envía).</p>
+
+    <form id="form">
+      <div class="row">
+        <input name="cedula" placeholder="Cédula" required />
+        <input name="nombre" placeholder="Nombre completo" required />
+      </div>
+
+      <div class="row">
+        <input name="correo" type="email" placeholder="Correo (opcional)" />
+        <input name="telefono" placeholder="Teléfono (opcional)" />
+      </div>
+
+      <div class="row">
+        <input name="evento_id" placeholder="ID del evento (opcional)" />
+      </div>
+
+      <button type="submit">Enviar preregistro</button>
+    </form>
+
+    <div id="result" style="margin-top:16px"></div>
+  </div>
+
+<script>
+const API_BASE = "https://universidaddeltolima.onrender.com";
+const form = document.getElementById('form');
+const result = document.getElementById('result');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  result.innerHTML = '<div class="notice">Registrando...</div>';
+  const fd = new FormData(form);
+  const payload = {
+    cedula: fd.get('cedula'),
+    nombre: fd.get('nombre'),
+    correo: fd.get('correo') || null,
+    telefono: fd.get('telefono') || null,
+    evento_id: fd.get('evento_id') || null
+  };
+  try {
+    const r = await fetch(`${API_BASE}/api/visitantes`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data?.error || 'Error al registrar');
+    // backend devuelve { ok: true, id, qr } o similar según tu implementación
+    const qr = data.qr || null;
+    const id = data.id || data.registration_id || data.id_registro;
+    result.innerHTML = `<div class="card center"><div>
+      <p>Preregistro exitoso. ID: <strong>${id}</strong></p>
+      ${qr ? `<img src="${qr}" class="qr" alt="QR" />` : '<p class="small">QR enviado por correo o disponible en la plataforma.</p>'}
+      <p class="small">Guarde este código para ingresar.</p>
+      <p><a href="exito.html?id=${id}">Ver página de éxito</a></p>
+    </div></div>`;
+  } catch (err) {
+    result.innerHTML = `<div class="notice">Error: ${err.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

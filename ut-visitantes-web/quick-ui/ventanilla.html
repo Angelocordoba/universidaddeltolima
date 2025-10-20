@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Ventanilla</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Ventanilla / Vigilancia</h1>
+      <div><a href="scanner.html" class="small">Abrir escáner QR</a> · <a href="index.html" class="small">Preregistro</a></div>
+    </div>
+
+    <div class="card">
+      <h3>Buscar visitante por cédula</h3>
+      <div class="row">
+        <input id="ced" placeholder="Cédula" />
+        <button id="btn-buscar">Buscar</button>
+      </div>
+      <div id="info" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+<script>
+const API_BASE = "https://universidaddeltolima.onrender.com";
+const btn = document.getElementById('btn-buscar');
+const ced = document.getElementById('ced');
+const info = document.getElementById('info');
+
+btn.addEventListener('click', async () => {
+  const c = ced.value.trim();
+  if (!c) return info.innerHTML = '<div class="notice">Ingrese cédula</div>';
+  info.innerHTML = 'Buscando...';
+  try {
+    const r = await fetch(`${API_BASE}/api/registros/buscar/${encodeURIComponent(c)}`);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d?.error||'No encontrado');
+    info.innerHTML = `<div>
+      <p><strong>${d.nombre}</strong> — ${d.evento || 'Sin evento'}</p>
+      <p class="small">Estado: ${d.estado}</p>
+      <button id="checkin">Registrar entrada</button>
+    </div>`;
+    document.getElementById('checkin').addEventListener('click', async () => {
+      info.innerHTML = 'Registrando entrada...';
+      const resp = await fetch(`${API_BASE}/api/registros/checkin`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: d.token || d.id }) });
+      const rj = await resp.json();
+      if (!resp.ok) throw new Error(rj?.error || 'Error checkin');
+      info.innerHTML = `<div class="notice">Entrada registrada: ${rj.nombre}</div>`;
+    });
+  } catch (err) {
+    info.innerHTML = `<div class="notice">Error: ${err.message}</div>`;
+  }
+});
+</script>
+</body>
+</html>

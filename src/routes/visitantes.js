@@ -1,5 +1,5 @@
 import express from "express";
-import supabase from "../services/supabaseClient.js";
+import { supabase } from "../services/supabaseClient.js";
 import { qrGenerator } from "../utils/qrGenerator.js";
 import { enviarCorreoInvitacion } from "../services/emailService.js";
 
